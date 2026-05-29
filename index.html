@@ -79,8 +79,191 @@
     <template id="tpl-stock-table">
         <div class="ba-stock-table">
             <h2>Manajemen Stok Bahan Ajar</h2>
-            <p>Halaman untuk melihat, menambah, mengubah, dan menghapus data stok bahan ajar.</p>
-            <!-- Implementasi lengkap di file stock-table.js -->
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>Filter & Pencarian</h3>
+                
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>UPBJJ (UT-Daerah):</label>
+                        <select v-model="filterUpbjj">
+                            <option value="">-- Semua UPBJJ --</option>
+                            <option v-for="upbjj in upbjjOptions" :key="upbjj" :value="upbjj">
+                                {{ upbjj }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Kategori Mata Kuliah:</label>
+                        <select v-model="filterKategori" :disabled="!filterUpbjj">
+                            <option value="">-- Semua Kategori --</option>
+                            <option v-for="cat in filteredCategoryOptions" :key="cat" :value="cat">
+                                {{ cat }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Cari (Kode/Judul/Lokasi):</label>
+                        <input 
+                            type="text" 
+                            v-model="searchKeyword"
+                            placeholder="Ketik untuk mencari...">
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" @click="resetFilter">🔄 Reset Filter</button>
+                </div>
+            </div>
+            
+            <!-- Add Button -->
+            <div class="mt-20">
+                <button class="btn btn-success" @click="showAddForm">➕ Tambah Data Baru</button>
+            </div>
+            
+            <!-- Form Add/Edit (Modal-like) -->
+            <div v-if="isFormVisible" class="modal-overlay" @click.self="isFormVisible = false">
+                <div class="modal">
+                    <h2>{{ formMode === 'add' ? 'Tambah Data Stok' : 'Edit Data Stok' }}</h2>
+                    
+                    <div class="form-group">
+                        <label>Kode Bahan Ajar:</label>
+                        <input 
+                            type="text" 
+                            v-model="formData.kode"
+                            @keypress="handleFormKeypress"
+                            placeholder="Contoh: EKMA4116">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Judul:</label>
+                        <input 
+                            type="text" 
+                            v-model="formData.judul"
+                            @keypress="handleFormKeypress"
+                            placeholder="Judul bahan ajar">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kategori:</label>
+                        <select v-model="formData.kategori">
+                            <option value="">-- Pilih Kategori --</option>
+                            <option v-for="cat in categoryOptions" :key="cat" :value="cat">
+                                {{ cat }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>UPBJJ:</label>
+                        <select v-model="formData.upbjj">
+                            <option value="">-- Pilih UPBJJ --</option>
+                            <option v-for="upbjj in upbjjOptions" :key="upbjj" :value="upbjj">
+                                {{ upbjj }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lokasi Rak:</label>
+                        <input 
+                            type="text" 
+                            v-model="formData.lokasiRak"
+                            @keypress="handleFormKeypress"
+                            placeholder="Contoh: R1-A3">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Harga (Rp):</label>
+                        <input 
+                            type="number" 
+                            v-model.number="formData.harga"
+                            @keypress="handleFormKeypress"
+                            placeholder="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qty (Stok):</label>
+                        <input 
+                            type="number" 
+                            v-model.number="formData.qty"
+                            @keypress="handleFormKeypress"
+                            placeholder="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Safety Stock:</label>
+                        <input 
+                            type="number" 
+                            v-model.number="formData.safety"
+                            @keypress="handleFormKeypress"
+                            placeholder="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Catatan (HTML):</label>
+                        <textarea 
+                            v-model="formData.catatanHTML"
+                            @keypress="handleFormKeypress"
+                            placeholder="Contoh: <em>Edisi 2024</em>"
+                            rows="3"></textarea>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @click="isFormVisible = false">Batal</button>
+                        <button class="btn btn-primary" @click="saveData">Simpan</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <table v-if="filteredData.length > 0" class="mt-20">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>UPBJJ</th>
+                        <th>Lokasi Rak</th>
+                        <th>Harga</th>
+                        <th>Qty</th>
+                        <th>Safety</th>
+                        <th>Status</th>
+                        <th>Catatan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in filteredData" :key="index">
+                        <td>{{ item.kode }}</td>
+                        <td>{{ item.judul }}</td>
+                        <td>{{ item.kategori }}</td>
+                        <td>{{ item.upbjj }}</td>
+                        <td>{{ item.lokasiRak }}</td>
+                        <td>{{ item.harga | currency }}</td>
+                        <td>{{ item.qty | unit }}</td>
+                        <td>{{ item.safety | unit }}</td>
+                        <td>
+                            <status-badge :qty="item.qty" :safety="item.safety" :catatan="item.catatanHTML"></status-badge>
+                        </td>
+                        <td>
+                            <div v-html="item.catatanHTML" class="catatan-preview"></div>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" @click="showEditForm(index)" title="Edit">✏️</button>
+                            <button class="btn btn-danger" @click="confirmDelete(index)" title="Hapus">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Empty State -->
+            <div v-else class="alert alert-info text-center mt-20">
+                Tidak ada data yang sesuai dengan filter yang dipilih.
+            </div>
         </div>
     </template>
 
