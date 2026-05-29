@@ -1,0 +1,16 @@
+    <!-- Template: Status Badge Component -->
+    <template id="tpl-status-badge">
+        <div class="status-badge-wrapper">
+            <span 
+                :class="badgeClass"
+                @mouseenter="toggleTooltip"
+                @mouseleave="hideTooltip"
+                :title="tooltipText">
+                {{ statusText }}
+            </span>
+            <!-- Tooltip catatan HTML -->
+            <div v-if="showTooltip && catatan" class="catatan-tooltip">
+                <div v-html="catatan"></div>
+            </div>
+        </div>
+    </template>
