@@ -1,3 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA - Aplikasi Pemesanan Bahan Ajar Universitas Terbuka</title>
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+    <!-- Root Vue Application -->
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <h1>SITTA</h1>
+            <p>Sistem Pemesanan & Tracking Bahan Ajar Universitas Terbuka</p>
+        </header>
+
+        <!-- Loading State -->
+        <div v-if="isLoading" class="alert alert-info text-center">
+            Memuat data, mohon tunggu...
+        </div>
+
+        <!-- Error State -->
+        <div v-if="apiError" class="alert alert-error">
+            Terjadi kesalahan: {{ apiError }}
+        </div>
+
+        <!-- Tab Navigation -->
+        <div v-if="!isLoading" class="tab-navigation">
+            <button 
+                class="tab-btn" 
+                :class="{ active: isStokTabActive }"
+                @click="switchTab('stok')">
+                📦 Stok & CRUD
+            </button>
+            <button 
+                class="tab-btn" 
+                :class="{ active: isTrackingTabActive }"
+                @click="switchTab('tracking')">
+                📍 Tracking DO
+            </button>
+            <button 
+                class="tab-btn" 
+                :class="{ active: isOrderTabActive }"
+                @click="switchTab('order')">
+                ✍️ Formulir Pemesanan
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div v-if="!isLoading && apiData" class="tab-content">
+            <!-- Stok & CRUD Tab -->
+            <div v-show="isStokTabActive">
+                <ba-stock-table :api-data="apiData"></ba-stock-table>
+            </div>
+
+            <!-- Tracking DO Tab -->
+            <div v-show="isTrackingTabActive">
+                <do-tracking :api-data="apiData"></do-tracking>
+            </div>
+
+            <!-- Order Form Tab -->
+            <div v-show="isOrderTabActive">
+                <order-form :api-data="apiData"></order-form>
+            </div>
+        </div>
+
+        <!-- Modal Component -->
+        <app-modal></app-modal>
+    </div>
+
+    <!-- =============================================
+         TEMPLATES (Penempatan semua template komponen)
+         ============================================= -->
+
+    <!-- Template: Stock Table Component -->
+    <template id="tpl-stock-table">
+        <div class="ba-stock-table">
+            <h2>Manajemen Stok Bahan Ajar</h2>
+            <p>Halaman untuk melihat, menambah, mengubah, dan menghapus data stok bahan ajar.</p>
+            <!-- Implementasi lengkap di file stock-table.js -->
+        </div>
+    </template>
+
+    <!-- Template: DO Tracking Component -->
+    <template id="tpl-do-tracking">
+        <div class="do-tracking">
+            <h2>Tracking Delivery Order (DO)</h2>
+            <p>Halaman untuk mencari dan melacak status pengiriman DO bahan ajar.</p>
+            <!-- Implementasi lengkap di file do-tracking.js -->
+        </div>
+    </template>
+
+    <!-- Template: Order Form Component -->
+    <template id="tpl-order-form">
+        <div class="order-form">
+            <h2>Formulir Pemesanan Baru</h2>
+            <p>Halaman untuk membuat pemesanan bahan ajar baru.</p>
+            <!-- Implementasi lengkap di file order-form.js -->
+        </div>
+    </template>
+
     <!-- Template: Status Badge Component -->
     <template id="tpl-status-badge">
         <div class="status-badge-wrapper">
@@ -14,3 +118,39 @@
             </div>
         </div>
     </template>
+
+    <!-- Template: Modal Component -->
+    <template id="tpl-app-modal">
+        <div v-if="isOpen" class="modal-overlay" @click.self="close">
+            <div class="modal">
+                <h2>{{ title }}</h2>
+                <p>{{ message }}</p>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="close">Batal</button>
+                    <button class="btn btn-danger" @click="confirm">{{ confirmText }}</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- =============================================
+         SCRIPT TAGS (Urutan penting sesuai spesifikasi)
+         ============================================= -->
+
+    <!-- 1. Vue.js v2 dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <!-- 2. Service Layer (API & Data) -->
+    <script src="./js/services/api.js"></script>
+
+    <!-- 3. Vue Components (Custom Elements) -->
+    <script src="./js/components/status-badge.js"></script>
+    <script src="./js/components/app-modal.js"></script>
+    <script src="./js/components/stock-table.js"></script>
+    <script src="./js/components/do-tracking.js"></script>
+    <script src="./js/components/order-form.js"></script>
+
+    <!-- 4. Root Vue Instance (App State & Coordination) -->
+    <script src="./js/app.js"></script>
+</body>
+</html>
