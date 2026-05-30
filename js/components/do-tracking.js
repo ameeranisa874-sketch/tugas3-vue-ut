@@ -71,19 +71,6 @@ Vue.component('do-tracking', {
             }
             
             return null;
-        },
-        
-        // Status styling berdasarkan status DO
-        statusClass() {
-            if (!this.foundTracking) return '';
-            
-            const status = this.foundTracking.data.status;
-            
-            if (status.includes('Terima')) return 'status-delivered';
-            if (status.includes('Dalam')) return 'status-shipping';
-            if (status.includes('Penolakan')) return 'status-rejected';
-            
-            return 'status-pending';
         }
     },
     
@@ -102,21 +89,6 @@ Vue.component('do-tracking', {
             };
         },
         
-        // Handle Enter key pada search
-        handleSearchKeypress(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                this.performSearch();
-            }
-        },
-        
-        // Handle Esc key untuk reset search
-        handleEscKey(event) {
-            if (event.key === 'Escape') {
-                this.resetSearch();
-            }
-        },
-        
         // Perform search
         performSearch() {
             if (!this.searchQuery.trim()) {
@@ -126,10 +98,6 @@ Vue.component('do-tracking', {
             
             this.hasSearched = true;
             console.log(`Searching by ${this.searchType}:`, this.searchQuery);
-            
-            if (!this.foundTracking) {
-                console.log('No matching tracking found');
-            }
         },
         
         // Reset search
@@ -156,16 +124,12 @@ Vue.component('do-tracking', {
         
         // Add DO baru
         addDo() {
-            // Validasi
             if (!this.newDoData.nim || !this.newDoData.nama) {
                 alert('NIM dan Nama harus diisi!');
                 return;
             }
             
-            // Generate nomor DO
             const doNumber = this.$root.generateDoNumber();
-            
-            // Buat object DO baru
             const newDo = {};
             newDo[doNumber] = {
                 ...this.newDoData,
@@ -175,45 +139,17 @@ Vue.component('do-tracking', {
                 }]
             };
             
-            // Tambah ke tracking data
             this.trackingData.push(newDo);
-            
             console.log('DO baru ditambahkan:', doNumber, newDo);
             alert(`DO baru berhasil dibuat: ${doNumber}`);
             
             this.isAddFormVisible = false;
             this.newDoData = this.getEmptyDoData();
-        },
-        
-        // Format tanggal untuk display
-        formatDateTime(dateTimeString) {
-            if (!dateTimeString) return '';
-            
-            const date = new Date(dateTimeString);
-            const options = {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            
-            return date.toLocaleDateString('id-ID', options);
         }
     },
     
     mounted() {
-        // Copy data dari apiData ke data lokal
         this.trackingData = JSON.parse(JSON.stringify(this.apiData.tracking || []));
         console.log('DO Tracking mounted with data:', this.trackingData);
-        
-        // Tambah event listener untuk keyboard shortcuts
-        document.addEventListener('keydown', this.handleEscKey);
-    },
-    
-    beforeDestroy() {
-        // Remove event listener
-        document.removeEventListener('keydown', this.handleEscKey);
     }
 });
