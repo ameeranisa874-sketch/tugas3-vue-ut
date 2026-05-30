@@ -1,9 +1,7 @@
 /**
  * Status Badge Component
- * Menampilkan badge status stok dengan warna sesuai kondisi:
- * - Hijau (Aman): qty >= safety
- * - Oranye (Menipis): qty < safety dan qty > 0
- * - Merah (Kosong): qty == 0
+ * Menampilkan status stok dengan warna dan tooltip
+ * Status: SAFE (qty > safety), WARNING (qty <= safety), DANGER (qty = 0)
  */
 
 Vue.component('status-badge', {
@@ -28,53 +26,45 @@ Vue.component('status-badge', {
         };
     },
     computed: {
-        // Tentukan status berdasarkan qty vs safety
+        // Status berdasarkan qty dan safety
         status() {
             if (this.qty === 0) {
-                return 'kosong';
-            } else if (this.qty < this.safety) {
-                return 'menipis';
+                return 'DANGER';
+            } else if (this.qty <= this.safety) {
+                return 'WARNING';
             } else {
-                return 'aman';
+                return 'SAFE';
             }
         },
         
-        // Tentukan class badge
+        // CSS class untuk badge
         badgeClass() {
-            return {
-                'badge': true,
-                'safe': this.status === 'aman',
-                'warning': this.status === 'menipis',
-                'danger': this.status === 'kosong'
-            };
+            return `badge ${this.status.toLowerCase()}`;
         },
         
-        // Tentukan text dan icon
+        // Text status
         statusText() {
-            switch(this.status) {
-                case 'aman':
-                    return '✓ Aman';
-                case 'menipis':
-                    return '⚠ Menipis';
-                case 'kosong':
-                    return '✗ Kosong';
-                default:
-                    return '?';
+            if (this.status === 'SAFE') {
+                return '✅ Aman';
+            } else if (this.status === 'WARNING') {
+                return '⚠️ Perlu Reorder';
+            } else {
+                return '❌ Stok Habis';
             }
         },
         
-        // Text untuk hover tooltip
+        // Tooltip text
         tooltipText() {
-            return `Stok: ${this.qty} | Safety: ${this.safety}`;
+            return `Qty: ${this.qty}, Safety: ${this.safety}`;
         }
     },
     methods: {
-        // Method untuk show/hide tooltip
+        // Toggle tooltip
         toggleTooltip() {
             this.showTooltip = !this.showTooltip;
         },
         
-        // Method untuk hide tooltip saat mouse leave
+        // Hide tooltip
         hideTooltip() {
             this.showTooltip = false;
         }
