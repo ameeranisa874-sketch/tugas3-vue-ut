@@ -1,118 +1,1142 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITTA - Aplikasi Pemesanan Bahan Ajar Universitas Terbuka</title>
-    
-    <!-- Global CSS -->
-    <link rel="stylesheet" href="./assets/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tugas Praktik 3 SITTA - Vue.js 2</title>
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --success: #16a34a;
+    --warning: #ea580c;
+    --danger: #dc2626;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: var(--gray-900);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .header p {
+    opacity: 0.9;
+    font-size: 14px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    background: white;
+    padding: 8px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--gray-600);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab:hover {
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+  .tab.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+  .form-input, .form-select {
+    padding: 10px 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+    min-width: 200px;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  }
+  .form-input.error {
+    border-color: var(--danger);
+  }
+  .error-text {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+  }
+  .btn-outline {
+    background: white;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+  }
+  .btn-outline:hover {
+    background: var(--gray-50);
+  }
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  th:hover {
+    background: var(--gray-100);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  tbody tr:hover {
+    background: var(--gray-50);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-hijau {
+    background: #dcfce7;
+    color: #166534;
+  }
+  .badge-orange {
+    background: #ffedd5;
+    color: #9a3412;
+  }
+  .badge-merah {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    border-bottom: 1px dotted var(--gray-600);
+  }
+  .tooltip .tooltip-text {
+    visibility: hidden;
+    background-color: var(--gray-900);
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: var(--shadow-lg);
+  }
+  .tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--gray-900) transparent transparent transparent;
+  }
+  .tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+  .modal {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease-out;
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-600);
+    line-height: 1;
+  }
+  .modal-body {
+    padding: 24px;
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .detail-box {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+  .detail-label {
+    color: var(--gray-600);
+    font-size: 14px;
+  }
+  .detail-value {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--gray-600);
+  }
+  .sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 12px;
+    opacity: 0.5;
+  }
+  .sort-active {
+    opacity: 1;
+    color: var(--primary);
+  }
+  @media (max-width: 768px) {
+    .container { padding: 12px; }
+    .card { padding: 16px; }
+    .form-input, .form-select { min-width: 100%; }
+    .toolbar { flex-direction: column; }
+    .toolbar .form-group { width: 100%; }
+    th, td { padding: 8px 12px; font-size: 13px; }
+  }
+</style>
 </head>
 <body>
-    <!-- Root Vue Application -->
-    <div id="app">
-        <!-- Header -->
-        <header>
-            <h1>SITTA</h1>
-            <p>Sistem Pemesanan & Tracking Bahan Ajar Universitas Terbuka</p>
-        </header>
-
-        <!-- Loading State -->
-        <div v-if="isLoading" class="alert alert-info text-center">
-            Memuat data, mohon tunggu...
-        </div>
-
-        <!-- Error State -->
-        <div v-if="apiError" class="alert alert-error">
-            Terjadi kesalahan: {{ apiError }}
-        </div>
-
-        <!-- Tab Navigation -->
-        <div v-if="!isLoading" class="tab-navigation">
-            <button 
-                class="tab-btn" 
-                :class="{ active: isStokTabActive }"
-                @click="switchTab('stok')">
-                📦 Stok & CRUD
-            </button>
-            <button 
-                class="tab-btn" 
-                :class="{ active: isTrackingTabActive }"
-                @click="switchTab('tracking')">
-                📍 Tracking DO
-            </button>
-            <button 
-                class="tab-btn" 
-                :class="{ active: isOrderTabActive }"
-                @click="switchTab('order')">
-                ✍️ Formulir Pemesanan
-            </button>
-        </div>
-
-        <!-- Tab Content -->
-        <div v-if="!isLoading && apiData" class="tab-content">
-            <!-- Stok & CRUD Tab -->
-            <div v-show="isStokTabActive">
-                <ba-stock-table :api-data="apiData"></ba-stock-table>
-            </div>
-
-            <!-- Tracking DO Tab -->
-            <div v-show="isTrackingTabActive">
-                <do-tracking :api-data="apiData"></do-tracking>
-            </div>
-
-            <!-- Order Form Tab -->
-            <div v-show="isOrderTabActive">
-                <order-form :api-data="apiData"></order-form>
-            </div>
-        </div>
-
-        <!-- Modal Component -->
-        <app-modal></app-modal>
+<div id="app">
+  <div class="container">
+    <div class="header">
+      <h1>Sistem Informasi Tracking Tugas Akhir (SITTA)</h1>
+      <p>Modul Bahan Ajar - Universitas Terbuka</p>
     </div>
 
-    <!-- =============================================
-         TEMPLATES (Load semua template dari folder templates/)
-         ============================================= -->
+    <div class="tabs">
+      <button class="tab" :class="{active: currentTab === 'stok'}" @click="currentTab = 'stok'">Stok Bahan Ajar</button>
+      <button class="tab" :class="{active: currentTab === 'tracking'}" @click="currentTab = 'tracking'">Tracking DO</button>
+      <button class="tab" :class="{active: currentTab === 'order'}" @click="currentTab = 'order'">Order Baru</button>
+    </div>
 
-    <!-- Include Templates -->
-    <script>
-        // Load template files
-        fetch('./templates/stock-table.html').then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
-        fetch('./templates/do-tracking.html').then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
-        fetch('./templates/order-form.html').then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
-        fetch('./templates/status-badge.html').then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
-        fetch('./templates/app-modal.html').then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
-    </script>
+    <ba-stock-table 
+      v-if="currentTab === 'stok'"
+      :data-stok="dataStok"
+      @edit="handleEditStok"
+      @delete="handleDeleteStok"
+      @add="handleAddStok">
+    </ba-stock-table>
 
-    <!-- =============================================
-         SCRIPT TAGS (Urutan penting sesuai spesifikasi)
-         ============================================= -->
+    <do-tracking 
+      v-if="currentTab === 'tracking'"
+      :data-do="dataDO"
+      :data-paket="dataPaket"
+      @add-do="handleAddDO">
+    </do-tracking>
 
-    <!-- 1. Vue.js v2 dari CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <order-form 
+      v-if="currentTab === 'order'"
+      :data-upbjj="dataUPBJJ"
+      :data-paket="dataPaket"
+      @submit-order="handleSubmitOrder">
+    </order-form>
+  </div>
 
-    <!-- 2. Service Layer (API & Data) -->
-    <script src="./js/services/api.js"></script>
+  <app-modal
+    :show="modalShow"
+    :title="modalTitle"
+    @close="closeModal">
+    <div v-if="modalType === 'confirm'">
+      <p>{{ modalMessage }}</p>
+    </div>
+    <div v-if="modalType === 'form'">
+      <div class="grid">
+        <div class="form-group">
+          <label class="form-label">Kode BA</label>
+          <input type="text" class="form-input" v-model="formStok.kode" 
+            @keyup.enter="saveStok"
+            @keyup.esc="closeModal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Judul</label>
+          <input type="text" class="form-input" v-model="formStok.judul"
+            @keyup.enter="saveStok"
+            @keyup.esc="closeModal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">UPBJJ</label>
+          <select class="form-select" v-model="formStok.upbjj">
+            <option v-for="u in dataUPBJJ" :key="u.kode" :value="u.kode">{{ u.nama }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-select" v-model="formStok.kategori">
+            <option value="MKDU">MKDU</option>
+            <option value="Program Studi">Program Studi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok</label>
+          <input type="number" class="form-input" v-model.number="formStok.stok"
+            @keyup.enter="saveStok"
+            @keyup.esc="closeModal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Harga</label>
+          <input type="number" class="form-input" v-model.number="formStok.harga"
+            @keyup.enter="saveStok"
+            @keyup.esc="closeModal">
+        </div>
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label class="form-label">Catatan HTML</label>
+          <textarea class="form-input" rows="3" v-model="formStok.catatanHTML"></textarea>
+        </div>
+      </div>
+    </div>
+    <template v-slot:footer>
+      <button v-if="modalType === 'confirm'" class="btn btn-outline" @click="closeModal">Batal</button>
+      <button v-if="modalType === 'confirm'" class="btn btn-danger" @click="confirmDelete">Hapus</button>
+      <button v-if="modalType === 'form'" class="btn btn-outline" 
+        @keyup.esc="closeModal" @click="closeModal">Batal</button>
+      <button v-if="modalType === 'form'" class="btn btn-primary" 
+        @keyup.enter="saveStok" @click="saveStok">Simpan</button>
+    </template>
+  </app-modal>
+</div>
 
-    <!-- 3. Vue Components (Custom Elements) -->
-    <script src="./js/components/status-badge.js"></script>
-    <script src="./js/components/app-modal.js"></script>
-    <script src="./js/components/stock-table.js"></script>
-    <script src="./js/components/do-tracking.js"></script>
-    <script src="./js/components/order-form.js"></script>
+<!-- Component Templates -->
+<script type="text/x-template" id="ba-stock-table-template">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Data Stok Bahan Ajar</h2>
+      <button class="btn btn-primary" @click="$emit('add')">
+        + Tambah Stok
+      </button>
+    </div>
+    
+    <div class="toolbar">
+      <div class="form-group">
+        <label class="form-label">Filter UPBJJ</label>
+        <select class="form-select" v-model="filterUpbjj">
+          <option value="">Semua UPBJJ</option>
+          <option v-for="u in upbjjList" :key="u.kode" :value="u.kode">{{ u.nama }}</option>
+        </select>
+      </div>
+      <div class="form-group" v-if="filterUpbjj">
+        <label class="form-label">Filter Kategori</label>
+        <select class="form-select" v-model="selectedPaket">
+          <option value="">Semua Kategori</option>
+          <option value="MKDU">MKDU</option>
+          <option value="Program Studi">Program Studi</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cari Judul/Kode</label>
+        <input type="text" class="form-input" v-model="searchQuery" placeholder="Ketik untuk mencari...">
+      </div>
+    </div>
 
-    <!-- 4. Root Vue Instance (App State & Coordination) -->
-    <script src="./js/app.js"></script>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th @click="toggleSort('kode')">
+              Kode BA <span class="sort-icon" :class="{'sort-active': sortKey === 'kode'}">{{ sortIcon('kode') }}</span>
+            </th>
+            <th @click="toggleSort('judul')">
+              Judul <span class="sort-icon" :class="{'sort-active': sortKey === 'judul'}">{{ sortIcon('judul') }}</span>
+            </th>
+            <th>UPBJJ</th>
+            <th>Kategori</th>
+            <th @click="toggleSort('stok')">
+              Stok <span class="sort-icon" :class="{'sort-active': sortKey === 'stok'}">{{ sortIcon('stok') }}</span>
+            </th>
+            <th @click="toggleSort('harga')">
+              Harga <span class="sort-icon" :class="{'sort-active': sortKey === 'harga'}">{{ sortIcon('harga') }}</span>
+            </th>
+            <th>Status</th>
+            <th>Catatan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in filteredSortedStok" :key="item.id">
+            <td><strong>{{ item.kode }}</strong></td>
+            <td>{{ item.judul }}</td>
+            <td>{{ getUpbjjName(item.upbjj) }}</td>
+            <td><span class="badge badge-info">{{ item.kategori }}</span></td>
+            <td>{{ item.stok }}</td>
+            <td>{{ item.harga | currency }}</td>
+            <td><status-badge :stok="item.stok"></status-badge></td>
+            <td>
+              <span class="tooltip">
+                Lihat Catatan
+                <span class="tooltip-text" v-html="item.catatanHTML"></span>
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline" @click="$emit('edit', item)">Edit</button>
+              <button class="btn btn-sm btn-danger" @click="$emit('delete', item)" style="margin-left:6px;">Hapus</button>
+            </td>
+          </tr>
+          <tr v-if="filteredSortedStok.length === 0">
+            <td colspan="9" class="empty-state">Tidak ada data stok ditemukan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="do-tracking-template">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Tracking Delivery Order (DO)</h2>
+      <button class="btn btn-primary" @click="showAddDO = !showAddDO">
+        + Buat DO Baru
+      </button>
+    </div>
+
+    <div class="toolbar">
+      <div class="form-group" style="flex: 1;">
+        <label class="form-label">Cari Nomor DO / NIM</label>
+        <input type="text" class="form-input" v-model="searchTerm"
+          @keyup.enter="searchDO"
+          @keyup.esc="clearSearch"
+          placeholder="Masukkan nomor DO atau NIM, Enter untuk cari, Esc untuk reset">
+      </div>
+    </div>
+
+    <div v-if="showAddDO" class="card" style="background: var(--gray-50);">
+      <h3 style="margin-bottom: 16px; font-size: 16px;">Form Tambah DO</h3>
+      <div class="grid">
+        <div class="form-group">
+          <label class="form-label">Nomor DO</label>
+          <input type="text" class="form-input" v-model="newDO.nomorDo" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">NIM Mahasiswa</label>
+          <input type="text" class="form-input" v-model="newDO.nim" placeholder="041234567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilih Paket</label>
+          <select class="form-select" v-model="newDO.paketId">
+            <option value="">-- Pilih Paket --</option>
+            <option v-for="p in dataPaket" :key="p.id" :value="p.id">{{ p.namaPaket }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Kirim</label>
+          <input type="date" class="form-input" v-model="newDO.tanggalKirim">
+        </div>
+      </div>
+
+      <div v-if="selectedPaketDetail" class="detail-box">
+        <h4 style="margin-bottom: 12px; font-size: 14px;">Detail Paket</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nama Paket</span>
+          <span class="detail-value">{{ selectedPaketDetail.namaPaket }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Program Studi</span>
+          <span class="detail-value">{{ selectedPaketDetail.prodi }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Jumlah MK</span>
+          <span class="detail-value">{{ selectedPaketDetail.jumlahMK }} Mata Kuliah</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Total Harga</span>
+          <span class="detail-value" style="color: var(--primary); font-size: 16px;">{{ totalHarga | currency }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tanggal Kirim</span>
+          <span class="detail-value">{{ newDO.tanggalKirim | tanggalID }}</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn btn-outline" @click="resetFormDO">Reset</button>
+        <button class="btn btn-success" @click="submitDO">Simpan DO</button>
+      </div>
+    </div>
+
+    <div v-if="searchResult.length > 0" class="table-wrapper" style="margin-top: 20px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Nomor DO</th>
+            <th>NIM</th>
+            <th>Paket</th>
+            <th>Tanggal Kirim</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in searchResult" :key="item.nomorDo">
+            <td><strong>{{ item.nomorDo }}</strong></td>
+            <td>{{ item.nim }}</td>
+            <td>{{ getPaketName(item.paketId) }}</td>
+            <td>{{ item.tanggalKirim | tanggalID }}</td>
+            <td><span class="badge badge-hijau">Terkirim</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-else-if="searchTerm && !searching" class="empty-state">
+      Data DO dengan nomor/NIM "{{ searchTerm }}" tidak ditemukan
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="order-form-template">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Form Order Bahan Ajar Baru</h2>
+    </div>
+
+    <div class="grid">
+      <div class="form-group">
+        <label class="form-label">NIM Mahasiswa *</label>
+        <input type="text" class="form-input" :class="{error: errors.nim}" v-model="form.nim" placeholder="041234567">
+        <span v-if="errors.nim" class="error-text">{{ errors.nim }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nama Mahasiswa *</label>
+        <input type="text" class="form-input" :class="{error: errors.nama}" v-model="form.nama" placeholder="Nama Lengkap">
+        <span v-if="errors.nama" class="error-text">{{ errors.nama }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">UPBJJ *</label>
+        <select class="form-select" :class="{error: errors.upbjj}" v-model="form.upbjj">
+          <option value="">-- Pilih UPBJJ --</option>
+          <option v-for="u in dataUpbjj" :key="u.kode" :value="u.kode">{{ u.nama }}</option>
+        </select>
+        <span v-if="errors.upbjj" class="error-text">{{ errors.upbjj }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Paket Matakuliah *</label>
+        <select class="form-select" :class="{error: errors.paketId}" v-model="form.paketId">
+          <option value="">-- Pilih Paket --</option>
+          <option v-for="p in dataPaket" :key="p.id" :value="p.id">{{ p.namaPaket }} - {{ p.prodi }}</option>
+        </select>
+        <span v-if="errors.paketId" class="error-text">{{ errors.paketId }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alamat Pengiriman *</label>
+        <textarea class="form-input" :class="{error: errors.alamat}" v-model="form.alamat" rows="3" placeholder="Alamat lengkap"></textarea>
+        <span v-if="errors.alamat" class="error-text">{{ errors.alamat }}</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">No. HP *</label>
+        <input type="tel" class="form-input" :class="{error: errors.hp}" v-model="form.hp" placeholder="08123456789">
+        <span v-if="errors.hp" class="error-text">{{ errors.hp }}</span>
+      </div>
+    </div>
+
+    <div v-if="selectedPaketForOrder" class="detail-box">
+      <h4 style="margin-bottom: 12px;">Ringkasan Order</h4>
+      <div class="detail-item">
+        <span class="detail-label">Paket Dipilih</span>
+        <span class="detail-value">{{ selectedPaketForOrder.namaPaket }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Jumlah MK</span>
+        <span class="detail-value">{{ selectedPaketForOrder.jumlahMK }} Mata Kuliah</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Total Harga</span>
+        <span class="detail-value" style="color: var(--primary); font-size: 18px;">{{ selectedPaketForOrder.harga | currency }}</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+      <button class="btn btn-outline" @click="resetForm">Reset Form</button>
+      <button class="btn btn-primary" @click="submitForm">Submit Order</button>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="status-badge-template">
+  <span class="badge" :class="badgeClass">
+    <span v-if="stok === 0">Kosong</span>
+    <span v-else-if="stok < 10">Menipis</span>
+    <span v-else>Aman</span>
+  </span>
+</script>
+
+<script type="text/x-template" id="app-modal-template">
+  <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ title }}</h3>
+        <button class="modal-close" @click="$emit('close')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <slot></slot>
+      </div>
+      <div class="modal-footer">
+        <slot name="footer"></slot>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script>
+const DUMMY_DATA = {
+  upbjj: [
+    { kode: "UT01", nama: "UPBJJ Jakarta" },
+    { kode: "UT02", nama: "UPBJJ Bandung" },
+    { kode: "UT03", nama: "UPBJJ Surabaya" },
+    { kode: "UT04", nama: "UPBJJ Medan" },
+    { kode: "UT05", nama: "UPBJJ Makassar" }
+  ],
+  paket: [
+    { id: 1, namaPaket: "Paket 1 - Semester 1", prodi: "Manajemen", jumlahMK: 5, harga: 450000 },
+    { id: 2, namaPaket: "Paket 2 - Semester 2", prodi: "Manajemen", jumlahMK: 6, harga: 520000 },
+    { id: 3, namaPaket: "Paket 1 - Semester 1", prodi: "Akuntansi", jumlahMK: 5, harga: 480000 },
+    { id: 4, namaPaket: "Paket 1 - Semester 1", prodi: "Ilmu Komunikasi", jumlahMK: 4, harga: 380000 },
+    { id: 5, namaPaket: "Paket 2 - Semester 2", prodi: "Sistem Informasi", jumlahMK: 6, harga: 550000 }
+  ],
+  stok: [
+    { id: 1, kode: "MKWU4108", judul: "Bahasa Indonesia", upbjj: "UT01", kategori: "MKDU", stok: 25, harga: 85000, catatanHTML: "<strong>Wajib</strong> untuk semua prodi<br>Edisi revisi 2024" },
+    { id: 2, kode: "MKWU4109", judul: "Pendidikan Agama", upbjj: "UT01", kategori: "MKDU", stok: 8, harga: 82000, catatanHTML: "Stok terbatas<br>Segera lakukan pengadaan" },
+    { id: 3, kode: "EKMA4111", judul: "Pengantar Bisnis", upbjj: "UT02", kategori: "Program Studi", stok: 0, harga: 95000, catatanHTML: "<span style='color:red'>Habis</span><br>Estimasi restok: 2 minggu" },
+    { id: 4, kode: "EKMA4115", judul: "Pengantar Akuntansi", upbjj: "UT03", kategori: "Program Studi", stok: 15, harga: 98000, catatanHTML: "Stok cukup<br>Prioritas pengiriman" },
+    { id: 5, kode: "SKOM4101", judul: "Pengantar Ilmu Komunikasi", upbjj: "UT04", kategori: "Program Studi", stok: 5, harga: 88000, catatanHTML: "Hampir habis<br>Koordinasi dengan pusat" },
+    { id: 6, kode: "MKWU4101", judul: "Pendidikan Kewarganegaraan", upbjj: "UT05", kategori: "MKDU", stok: 30, harga: 80000, catatanHTML: "Stok aman<br>Dapat melayani 3 bulan" }
+  ],
+  deliveryOrders: [
+    { nomorDo: "DO2025-001", nim: "041234567", paketId: 1, tanggalKirim: "2025-08-20" },
+    { nomorDo: "DO2025-002", nim: "041234568", paketId: 2, tanggalKirim: "2025-08-21" },
+    { nomorDo: "DO2025-003", nim: "041234569", paketId: 3, tanggalKirim: "2025-08-22" }
+  ]
+};
+
+Vue.component('status-badge', {
+  template: '#status-badge-template',
+  props: ['stok'],
+  computed: {
+    badgeClass() {
+      if (this.stok === 0) return 'badge-merah';
+      if (this.stok < 10) return 'badge-orange';
+      return 'badge-hijau';
+    }
+  }
+});
+
+Vue.component('app-modal', {
+  template: '#app-modal-template',
+  props: ['show', 'title']
+});
+
+Vue.component('ba-stock-table', {
+  template: '#ba-stock-table-template',
+  props: ['dataStok'],
+  data() {
+    return {
+      filterUpbjj: '',
+      selectedPaket: '',
+      searchQuery: '',
+      sortKey: 'kode',
+      sortOrder: 1,
+      upbjjList: DUMMY_DATA.upbjj
+    }
+  },
+  computed: {
+    filteredStok() {
+      let result = this.dataStok;
+      if (this.filterUpbjj) {
+        result = result.filter(item => item.upbjj === this.filterUpbjj);
+      }
+      if (this.selectedPaket) {
+        result = result.filter(item => item.kategori === this.selectedPaket);
+      }
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        result = result.filter(item => 
+          item.judul.toLowerCase().includes(query) || 
+          item.kode.toLowerCase().includes(query)
+        );
+      }
+      return result;
+    },
+    filteredSortedStok() {
+      const data = [...this.filteredStok];
+      const key = this.sortKey;
+      return data.sort((a, b) => {
+        let va = a[key];
+        let vb = b[key];
+        if (typeof va === 'string') {
+          va = va.toLowerCase();
+          vb = vb.toLowerCase();
+        }
+        if (va < vb) return -1 * this.sortOrder;
+        if (va > vb) return 1 * this.sortOrder;
+        return 0;
+      });
+    }
+  },
+  watch: {
+    filterUpbjj() {
+      this.selectedPaket = '';
+    },
+    selectedPaket() {}
+  },
+  methods: {
+    toggleSort(key) {
+      if (this.sortKey === key) {
+        this.sortOrder = -this.sortOrder;
+      } else {
+        this.sortKey = key;
+        this.sortOrder = 1;
+      }
+    },
+    sortIcon(key) {
+      if (this.sortKey !== key) return '⇅';
+      return this.sortOrder === 1 ? '↑' : '↓';
+    },
+    getUpbjjName(kode) {
+      const u = this.upbjjList.find(x => x.kode === kode);
+      return u ? u.nama : kode;
+    }
+  },
+  filters: {
+    currency(val) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+      }).format(val);
+    }
+  }
+});
+
+Vue.component('do-tracking', {
+  template: '#do-tracking-template',
+  props: ['dataDo', 'dataPaket'],
+  data() {
+    return {
+      searchTerm: '',
+      searchResult: [],
+      searching: false,
+      showAddDO: false,
+      newDO: {
+        nomorDo: '',
+        nim: '',
+        paketId: '',
+        tanggalKirim: new Date().toISOString().split('T')[0]
+      }
+    }
+  },
+  computed: {
+    selectedPaketDetail() {
+      return this.dataPaket.find(p => p.id == this.newDO.paketId);
+    },
+    totalHarga() {
+      return this.selectedPaketDetail ? this.selectedPaketDetail.harga : 0;
+    }
+  },
+  methods: {
+    searchDO() {
+      if (!this.searchTerm.trim()) {
+        this.searchResult = [];
+        return;
+      }
+      this.searching = true;
+      const term = this.searchTerm.toLowerCase();
+      this.searchResult = this.dataDo.filter(item => 
+        item.nomorDo.toLowerCase().includes(term) || 
+        item.nim.toLowerCase().includes(term)
+      );
+      this.searching = false;
+    },
+    clearSearch() {
+      this.searchTerm = '';
+      this.searchResult = [];
+    },
+    generateNoDO() {
+      const count = this.dataDo.length + 1;
+      return `DO2025-${String(count).padStart(3, '0')}`;
+    },
+    resetFormDO() {
+      this.newDO = {
+        nomorDo: this.generateNoDO(),
+        nim: '',
+        paketId: '',
+        tanggalKirim: new Date().toISOString().split('T')[0]
+      };
+    },
+    submitDO() {
+      if (!this.newDO.nim || !this.newDO.paketId) {
+        alert('Lengkapi NIM dan Paket terlebih dahulu!');
+        return;
+      }
+      this.$emit('add-do', { ...this.newDO });
+      this.showAddDO = false;
+      this.resetFormDO();
+    },
+    getPaketName(id) {
+      const p = this.dataPaket.find(x => x.id === id);
+      return p ? p.namaPaket : '-';
+    }
+  },
+  filters: {
+    tanggalID(val) {
+      if (!val) return '-';
+      const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const d = new Date(val);
+      return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+    }
+  },
+  mounted() {
+    this.newDO.nomorDo = this.generateNoDO();
+  }
+});
+
+Vue.component('order-form', {
+  template: '#order-form-template',
+  props: ['dataUpbjj', 'dataPaket'],
+  data() {
+    return {
+      form: {
+        nim: '',
+        nama: '',
+        upbjj: '',
+        paketId: '',
+        alamat: '',
+        hp: ''
+      },
+      errors: {}
+    }
+  },
+  computed: {
+    selectedPaketForOrder() {
+      return this.dataPaket.find(p => p.id == this.form.paketId);
+    }
+  },
+  methods: {
+    validateForm() {
+      this.errors = {};
+      if (!this.form.nim) this.errors.nim = 'NIM wajib diisi';
+      else if (this.form.nim.length < 9) this.errors.nim = 'NIM minimal 9 digit';
+      
+      if (!this.form.nama) this.errors.nama = 'Nama wajib diisi';
+      if (!this.form.upbjj) this.errors.upbjj = 'Pilih UPBJJ';
+      if (!this.form.paketId) this.errors.paketId = 'Pilih paket matakuliah';
+      if (!this.form.alamat) this.errors.alamat = 'Alamat wajib diisi';
+      
+      if (!this.form.hp) this.errors.hp = 'No HP wajib diisi';
+      else if (!/^08[0-9]{8,11}$/.test(this.form.hp)) this.errors.hp = 'Format HP tidak valid';
+      
+      return Object.keys(this.errors).length === 0;
+    },
+    submitForm() {
+      if (this.validateForm()) {
+        this.$emit('submit-order', { ...this.form });
+        alert('Order berhasil disubmit!');
+        this.resetForm();
+      }
+    },
+    resetForm() {
+      this.form = {
+        nim: '',
+        nama: '',
+        upbjj: '',
+        paketId: '',
+        alamat: '',
+        hp: ''
+      };
+      this.errors = {};
+    }
+  },
+  filters: {
+    currency(val) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+      }).format(val);
+    }
+  }
+});
+
+new Vue({
+  el: '#app',
+  data: {
+    currentTab: 'stok',
+    dataStok: DUMMY_DATA.stok,
+    dataDO: DUMMY_DATA.deliveryOrders,
+    dataPaket: DUMMY_DATA.paket,
+    dataUPBJJ: DUMMY_DATA.upbjj,
+    modalShow: false,
+    modalType: '',
+    modalTitle: '',
+    modalMessage: '',
+    formStok: {
+      id: null,
+      kode: '',
+      judul: '',
+      upbjj: '',
+      kategori: 'MKDU',
+      stok: 0,
+      harga: 0,
+      catatanHTML: ''
+    },
+    deleteItem: null,
+    editingId: null
+  },
+  methods: {
+    handleAddStok() {
+      this.editingId = null;
+      this.formStok = {
+        id: null,
+        kode: '',
+        judul: '',
+        upbjj: this.dataUPBJJ[0].kode,
+        kategori: 'MKDU',
+        stok: 0,
+        harga: 0,
+        catatanHTML: ''
+      };
+      this.modalTitle = 'Tambah Stok Bahan Ajar';
+      this.modalType = 'form';
+      this.modalShow = true;
+    },
+    handleEditStok(item) {
+      this.editingId = item.id;
+      this.formStok = { ...item };
+      this.modalTitle = 'Edit Stok Bahan Ajar';
+      this.modalType = 'form';
+      this.modalShow = true;
+    },
+    handleDeleteStok(item) {
+      this.deleteItem = item;
+      this.modalTitle = 'Konfirmasi Hapus';
+      this.modalMessage = `Yakin ingin menghapus ${item.kode} - ${item.judul}?`;
+      this.modalType = 'confirm';
+      this.modalShow = true;
+    },
+    saveStok() {
+      if (!this.formStok.kode || !this.formStok.judul) {
+        alert('Kode dan Judul wajib diisi!');
+        return;
+      }
+      if (this.editingId) {
+        const idx = this.dataStok.findIndex(x => x.id === this.editingId);
+        if (idx > -1) {
+          this.$set(this.dataStok, idx, { ...this.formStok, id: this.editingId });
+        }
+      } else {
+        const newId = Math.max(...this.dataStok.map(x => x.id)) + 1;
+        this.dataStok.push({ ...this.formStok, id: newId });
+      }
+      this.closeModal();
+    },
+    confirmDelete() {
+      this.dataStok = this.dataStok.filter(x => x.id !== this.deleteItem.id);
+      this.closeModal();
+    },
+    closeModal() {
+      this.modalShow = false;
+      this.modalType = '';
+      this.deleteItem = null;
+    },
+    handleAddDO(newDOData) {
+      this.dataDO.push(newDOData);
+    },
+    handleSubmitOrder(orderData) {
+      console.log('Order baru:', orderData);
+    }
+  }
+});
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 </body>
 </html>
