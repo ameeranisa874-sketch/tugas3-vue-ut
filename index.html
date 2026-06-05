@@ -769,35 +769,57 @@
 </script>
 
 <script>
-const DUMMY_DATA = {
-  upbjj: [
-    { kode: "UT01", nama: "UPBJJ Jakarta" },
-    { kode: "UT02", nama: "UPBJJ Bandung" },
-    { kode: "UT03", nama: "UPBJJ Surabaya" },
-    { kode: "UT04", nama: "UPBJJ Medan" },
-    { kode: "UT05", nama: "UPBJJ Makassar" }
-  ],
-  paket: [
-    { id: 1, namaPaket: "Paket 1 - Semester 1", prodi: "Manajemen", jumlahMK: 5, harga: 450000 },
-    { id: 2, namaPaket: "Paket 2 - Semester 2", prodi: "Manajemen", jumlahMK: 6, harga: 520000 },
-    { id: 3, namaPaket: "Paket 1 - Semester 1", prodi: "Akuntansi", jumlahMK: 5, harga: 480000 },
-    { id: 4, namaPaket: "Paket 1 - Semester 1", prodi: "Ilmu Komunikasi", jumlahMK: 4, harga: 380000 },
-    { id: 5, namaPaket: "Paket 2 - Semester 2", prodi: "Sistem Informasi", jumlahMK: 6, harga: 550000 }
-  ],
-  stok: [
-    { id: 1, kode: "MKWU4108", judul: "Bahasa Indonesia", upbjj: "UT01", kategori: "MKDU", stok: 25, harga: 85000, catatanHTML: "<strong>Wajib</strong> untuk semua prodi<br>Edisi revisi 2024" },
-    { id: 2, kode: "MKWU4109", judul: "Pendidikan Agama", upbjj: "UT01", kategori: "MKDU", stok: 8, harga: 82000, catatanHTML: "Stok terbatas<br>Segera lakukan pengadaan" },
-    { id: 3, kode: "EKMA4111", judul: "Pengantar Bisnis", upbjj: "UT02", kategori: "Program Studi", stok: 0, harga: 95000, catatanHTML: "<span style='color:red'>Habis</span><br>Estimasi restok: 2 minggu" },
-    { id: 4, kode: "EKMA4115", judul: "Pengantar Akuntansi", upbjj: "UT03", kategori: "Program Studi", stok: 15, harga: 98000, catatanHTML: "Stok cukup<br>Prioritas pengiriman" },
-    { id: 5, kode: "SKOM4101", judul: "Pengantar Ilmu Komunikasi", upbjj: "UT04", kategori: "Program Studi", stok: 5, harga: 88000, catatanHTML: "Hampir habis<br>Koordinasi dengan pusat" },
-    { id: 6, kode: "MKWU4101", judul: "Pendidikan Kewarganegaraan", upbjj: "UT05", kategori: "MKDU", stok: 30, harga: 80000, catatanHTML: "Stok aman<br>Dapat melayani 3 bulan" }
-  ],
-  deliveryOrders: [
-    { nomorDo: "DO2025-001", nim: "041234567", paketId: 1, tanggalKirim: "2025-08-20" },
-    { nomorDo: "DO2025-002", nim: "041234568", paketId: 2, tanggalKirim: "2025-08-21" },
-    { nomorDo: "DO2025-003", nim: "041234569", paketId: 3, tanggalKirim: "2025-08-22" }
-  ]
-};
+// Fungsi untuk memuat data eksternal dari data/dataBahanAjar.json
+function loadExternalData() {
+  return fetch('data/dataBahanAjar.json')
+    .then(r => {
+      if (!r.ok) throw new Error('Gagal memuat data/dataBahanAjar.json');
+      return r.json();
+    })
+    .then(j => {
+      // Map upbjjList (array string) -> { kode, nama }
+      const dataUPBJJ = (j.upbjjList || []).map(n => ({ kode: n, nama: n }));
+
+      // Map paket -> bentuk yang digunakan komponen (id, namaPaket, prodi, jumlahMK, harga)
+      const dataPaket = (j.paket || []).map(p => ({
+        id: p.kode,
+        namaPaket: p.nama,
+        prodi: p.prodi || '-',
+        jumlahMK: Array.isArray(p.isi) ? p.isi.length : 0,
+        harga: p.harga || 0
+      }));
+
+      // Map stok -> bentuk komponen (id, kode, judul, upbjj, kategori, stok, harga, catatanHTML)
+      const dataStok = (j.stok || []).map((s, idx) => ({
+        id: idx + 1,
+        kode: s.kode,
+        judul: s.judul,
+        upbjj: s.upbjj,
+        kategori: s.kategori,
+        stok: s.qty !== undefined ? s.qty : (s.stok || 0),
+        harga: s.harga,
+        catatanHTML: s.catatanHTML || ''
+      }));
+
+      // Map tracking -> array deliveryOrders {nomorDo, nim, paketId, tanggalKirim}
+      const dataDO = [];
+      if (Array.isArray(j.tracking)) {
+        j.tracking.forEach(obj => {
+          Object.keys(obj).forEach(no => {
+            const v = obj[no];
+            dataDO.push({
+              nomorDo: no,
+              nim: v.nim || '',
+              paketId: v.paket || '',
+              tanggalKirim: v.tanggalKirim || ''
+            });
+          });
+        });
+      }
+
+      return { dataUPBJJ, dataPaket, dataStok, dataDO };
+    });
+}
 
 Vue.component('status-badge', {
   template: '#status-badge-template',
@@ -826,7 +848,7 @@ Vue.component('ba-stock-table', {
       searchQuery: '',
       sortKey: 'kode',
       sortOrder: 1,
-      upbjjList: DUMMY_DATA.upbjj
+      upbjjList: []
     }
   },
   computed: {
@@ -1051,10 +1073,10 @@ new Vue({
   el: '#app',
   data: {
     currentTab: 'stok',
-    dataStok: DUMMY_DATA.stok,
-    dataDO: DUMMY_DATA.deliveryOrders,
-    dataPaket: DUMMY_DATA.paket,
-    dataUPBJJ: DUMMY_DATA.upbjj,
+    dataStok: [],
+    dataDO: [],
+    dataPaket: [],
+    dataUPBJJ: [],
     modalShow: false,
     modalType: '',
     modalTitle: '',
@@ -1072,6 +1094,25 @@ new Vue({
     deleteItem: null,
     editingId: null
   },
+  created() {
+    // Muat data eksternal dari data/dataBahanAjar.json saat Vue instance dibuat
+    loadExternalData()
+      .then(d => {
+        this.dataUPBJJ = d.dataUPBJJ;
+        this.dataPaket = d.dataPaket;
+        this.dataStok = d.dataStok;
+        this.dataDO = d.dataDO;
+        
+        // Inisialisasi form dengan UPBJJ pertama jika tersedia
+        if (this.dataUPBJJ.length > 0) {
+          this.formStok.upbjj = this.dataUPBJJ[0].kode;
+        }
+      })
+      .catch(err => {
+        console.error('Gagal memuat data eksternal:', err);
+        alert('Gagal memuat data. Pastikan file data/dataBahanAjar.json ada dan aksesibel.');
+      });
+  },
   methods: {
     handleAddStok() {
       this.editingId = null;
@@ -1079,7 +1120,7 @@ new Vue({
         id: null,
         kode: '',
         judul: '',
-        upbjj: this.dataUPBJJ[0].kode,
+        upbjj: this.dataUPBJJ.length > 0 ? this.dataUPBJJ[0].kode : '',
         kategori: 'MKDU',
         stok: 0,
         harga: 0,
@@ -1114,7 +1155,7 @@ new Vue({
           this.$set(this.dataStok, idx, { ...this.formStok, id: this.editingId });
         }
       } else {
-        const newId = Math.max(...this.dataStok.map(x => x.id)) + 1;
+        const newId = Math.max(...this.dataStok.map(x => x.id), 0) + 1;
         this.dataStok.push({ ...this.formStok, id: newId });
       }
       this.closeModal();
