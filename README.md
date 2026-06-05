@@ -1,4 +1,4 @@
-# SITTA - Sistem Pemesanan & Tracking Bahan Ajar Universitas Terbuka
+# SITTA - Sistem Informasi Tiras dan Transaksi Bahan Ajar Universitas Terbuka
 
 Aplikasi web Vue.js v2 untuk mengelola pemesanan dan tracking bahan ajar di Universitas Terbuka.
 
